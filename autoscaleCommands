@@ -1,0 +1,51 @@
+### TEST Launch Configuration
+
+export LAUNCH_CONFIG_NAME="chef_prep_enabled_lc" 
+export SECURITY_GROUP="CanonicalWithPingNoUDP" 
+export KEY_PAIR_NAME="cli_test_key_pair"
+export INSTANCE_TYPE="t1.micro"
+export AMI_ID="ami-013f9768"
+export USER_DATA_FILENAME="AWSUserDataChefPrefPasswd.sh"
+
+### Create the Launch Configuration
+# NOTE: This is where we tie in the user-data which will enable our instance for knife upon bootup
+aws autoscaling create-launch-configuration --launch-configuration-name "${LAUNCH_CONFIG_NAME}" --instance-type "${INSTANCE_TYPE}" --key-name "${KEY_PAIR_NAME}" --security-groups "${SECURITY_GROUP}" --image-id "${AMI_ID}" --user-data "`cat ${USER_DATA_FILENAME}`"
+
+### TEST Create Auto Scaling Group
+export AS_GROUP_NAME="chef_prepped_as_group"
+export AZ="us-east-1c"
+aws autoscaling create-auto-scaling-group --auto-scaling-group-name "${AS_GROUP_NAME}" --launch-configuration-name "${LAUNCH_CONFIG_NAME}" --min-size 0 --max-size 1 --desired-capacity 1 --availability-zones "${AZ}"
+
+### Create Auto Scaling Tags
+## ?? aws autoscale create-or-update-tags --tags "Autoscaled=Yes"
+
+### Describe Auto Scaling Group
+aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names "${AS_GROUP_NAME}"
+
+### Create a Schedule Based Auto Scaling Policy - SCALE OUT
+export ACTION_SCALE_OUT="scale-out"
+export TOP_OF_THE_HOUR="0 * * * *"
+aws autoscaling put-scheduled-update-group-action --auto-scaling-group-name "${AS_GROUP_NAME}" --scheduled-action-name "${ACTION_SCALE_OUT}" --recurrence "${TOP_OF_THE_HOUR}" --min-size 1 --max-size 1 --desired-capacity 1
+
+### Describe Scheduled Actions
+aws autoscaling describe-scheduled-actions
+
+### Create a Schedule Based Auto Scaling Policy - SCALE IN
+export ACTION_SCALE_IN="scale-in"
+export HALF_PAST_THE_HOUR="30 * * * *"
+aws autoscaling put-scheduled-update-group-action --auto-scaling-group-name "${AS_GROUP_NAME}" --scheduled-action-name "${ACTION_SCALE_IN}" --recurrence "${HALF_PAST_THE_HOUR}" --min-size 0 --max-size 1 --desired-capacity 0
+
+### Describe Scheduled Actions
+aws autoscaling describe-scheduled-actions
+
+### To remove Actions
+#aws autoscaling delete-scheduled-action --scheduled-action-name something
+
+
+### To TERMINATE 
+# 1) First Update Auto Scaling Group to size=0
+#aws autoscaling update-auto-scaling-group --auto-scaling-group-name "${AS_GROUP_NAME}" --min-size 0 --max-size 0 
+# 2) Confirm Autoscaling Status
+#aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name "${AS_GROUP_NAME}"
+# 3) Delete Autoscaling Group
+#aws autoscaling delete-auto-scaling-group --auto-scaling-group-name "${AS_GROUP_NAME}"
