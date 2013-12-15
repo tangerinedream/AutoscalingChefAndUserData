@@ -7,6 +7,9 @@
 #	3. Enablement of SSH Password based Authentication (requires ssh service to be restarted).
 #	4. Enable sudo privileges for 'opscode' user.
 #
+#  The general knife usage command associated with this configuration would be:
+#      knife bootstrap $NODE_IP --sudo -x <ssh-user-id> -P <ssh-passcode-for-user> -N "<your node name>"
+#      when prompted, enter sudo password for <ssh-user-id>
 ###
 
 ###

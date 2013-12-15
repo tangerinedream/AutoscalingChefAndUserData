@@ -7,6 +7,9 @@
 #	3. Instead of SSH Password based Authentication, use the AWS PEM "key file" file for authentication
 #	4. Enable sudo privileges for 'opscode' user.
 #
+#  The associated knife command usage would be similar to:
+#      knife bootstrap $NODE_IP --sudo -x <ssh-user-id> -i <path to (AWS).pem file> -N "<your node name>""
+#      when prompted, enter sudo passcode for <ssh-user-id>
 ###
 
 ###
