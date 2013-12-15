@@ -28,9 +28,9 @@ useradd -m -s /bin/bash -p '$6$Ka3r1lxR$75GM7Cc2g86KafLQC3T4Tbb.YxAHXcgbpL9BDs.n
 
 ###
 # In this version, you need not modify the sshd_config file.  However, you do need to know the location of where the AWS Key File is located, so you can copy it to opscode user
-export SOURCE_UID="ubuntu""
-export SOURCE_SSH_DIR="~${SOURCE_UID}/.ssh"
-export TARGET_SSH_DIR="~${TARGET_UID}/.ssh"
+export SOURCE_UID="ubuntu"
+export SOURCE_SSH_DIR="/home/${SOURCE_UID}/.ssh"
+export TARGET_SSH_DIR="/home/${TARGET_UID}/.ssh"
 mkdir -p "${TARGET_SSH_DIR}"
 export AWS_SOURCE_KEY_FILE="${SOURCE_SSH_DIR}/authorized_keys"
 export AWS_TARGET_KEY_FILE="${TARGET_SSH_DIR}/authorized_keys"
@@ -42,12 +42,13 @@ chgrp -R "${TARGET_UID}" "${TARGET_SSH_DIR}"
 ###
 # Edit /etc/sudoers.  Allow opscode to execute sudo based commands 
 # Backup the original file first
-cp /etc/sudoers /etc/sudoers.orig
+export SUDOERS_FILE="/etc/sudoers"
+cp "${SUDOERS_FILE}" "${SUDOERS_FILE}.orig"
 #
 (
 cat <<EOF
 
 opscode ALL=(ALL:ALL) ALL
 EOF
-) >> /etc/sudoers
+) >> "${SUDOERS_FILE}"
 ###

@@ -30,13 +30,15 @@ useradd -m -s /bin/bash -p '$6$Ka3r1lxR$75GM7Cc2g86KafLQC3T4Tbb.YxAHXcgbpL9BDs.n
 # Edit sshd_config to allow for password based authentication
 # Backup the original file first
 export SSH_HOME="/etc/ssh"
-export SED="/bin/sed""
-cp "${SSH_HOME}/sshd_config" "${SSH_HOME}/sshd_config.orig"
+export SSH_CONFIG_FILE="${SSH_HOME}/sshd_config"
+export SSH_TMP_FILE="/tmp/sshd_config"
+export SED="/bin/sed"
+cp "${SSH_CONFIG_FILE}" "${SSH_CONFIG_FILE}.orig"
 # In /etc/ssh/sshd_config, change "PasswordAuthentication no" to yes, when it exists in column 1.
-"${SED}" 's/^PasswordAuthentication no/PasswordAuthentication yes/g' "${SSH_HOME}/sshd_config" >/tmp/sshd_config
+"${SED}" 's/^PasswordAuthentication no/PasswordAuthentication yes/g' "${SSH_CONFIG_FILE}" > "${SSH_TMP_FILE}"
 # maintain file ownership and perms
-cat /tmp/sshd_config >"${SSH_HOME}/sshd_config"
-rm -f /tmp/sshd_config
+cat "${SSH_TMP_FILE}" > "${SSH_CONFIG_FILE}" 
+rm -f "${SSH_TMP_FILE}"
 ###
 
 ###
