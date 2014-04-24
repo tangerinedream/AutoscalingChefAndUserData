@@ -5,7 +5,7 @@ export SECURITY_GROUP="CanonicalWithPingNoUDP"
 export KEY_PAIR_NAME="cli_test_key_pair"
 export INSTANCE_TYPE="t1.micro"
 export AMI_ID="ami-013f9768"
-export USER_DATA_FILENAME="AWSUserDataChefPrefPasswd.sh"
+export USER_DATA_FILENAME="UserData.ChefAuthPEM.src.sh"
 
 ### Create the Launch Configuration
 # NOTE: This is where we tie in the user-data which will enable our instance for knife upon bootup
