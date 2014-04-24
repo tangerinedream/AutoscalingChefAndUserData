@@ -1,11 +1,12 @@
 #!/bin/bash
+export LOG_FILE="/tmp/cloud-init_log.txt"
 ###
 #
 #  This script takes the necessary steps to enable a linux AMI (e.g. Ubuntu) for Chef to be installed later via Knife.  It has the following responsibilities:
-#	1. general update of system
-#	2. User 'opscode' creation
-#	3. Enablement of SSH Password based Authentication (requires ssh service to be restarted).
-#	4. Enable sudo privileges for 'opscode' user.
+#  1. general update of system
+#  2. User 'opscode' creation
+#  3. Enablement of SSH Password based Authentication (requires ssh service to be restarted).
+#  4. Enable sudo privileges for 'opscode' user.
 #
 #  The general knife usage command associated with this configuration would be:
 #      knife bootstrap $NODE_IP --sudo -x <ssh-user-id> -P <ssh-passcode-for-user> -N "<your node name>"
@@ -21,6 +22,7 @@ set -x
 # Bring system up to date
 apt-get -y update
 # apt-get -y upgrade
+echo [`date +%F`][`date +%T`] apt-get complete >>"${LOG_FILE}"
 ### 
 
 ###
@@ -42,6 +44,7 @@ cp "${SSH_CONFIG_FILE}" "${SSH_CONFIG_FILE}.orig"
 # maintain file ownership and perms
 cat "${SSH_TMP_FILE}" > "${SSH_CONFIG_FILE}" 
 rm -f "${SSH_TMP_FILE}"
+echo [`date +%F`][`date +%T`] opscode password based authentication in place >>"${LOG_FILE}"
 ###
 
 ###
@@ -56,6 +59,7 @@ cat <<EOF
 opscode ALL=(ALL:ALL) ALL
 EOF
 ) >> "${SUDOERS_FILE}"
+echo [`date +%F`][`date +%T`] opscode authorized in sudoers file >>"${LOG_FILE}"
 ###
 
 ###
@@ -63,4 +67,5 @@ EOF
 # For some reason, service ssh restart is not effective.
 service ssh stop
 service ssh start
-###
+echo [`date +%F`][`date +%T`] Cloud-init script completed >>"${LOG_FILE}"
+###\n"
